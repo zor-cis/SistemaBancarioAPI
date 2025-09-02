@@ -41,7 +41,7 @@ namespace Application.Services
         {
             try
             {
-                await File.AppendAllTextAsync(_logFilePath, Environment.NewLine);
+                await File.AppendAllTextAsync(_logFilePath, message + Environment.NewLine);
             }
             catch (Exception ex)
             {

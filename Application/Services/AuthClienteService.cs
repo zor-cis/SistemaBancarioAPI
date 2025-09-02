@@ -122,7 +122,7 @@ namespace Application.Services
 
                 return new AuthClient
                 {
-                    NombreCompleto = $"{client.FullName()}",
+                    NombreCompleto = client.FullName(),
                     Email = client.Email,
                     Token = token,
                 };
