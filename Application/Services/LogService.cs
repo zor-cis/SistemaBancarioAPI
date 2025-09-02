@@ -54,7 +54,7 @@ namespace Application.Services
             try
             {
                 var result = Exited ? "exitoso" : "fallido";
-                var logMessage = $"{DateTime.Now: dd-MM-yyyyy} Login {result} - Email: {email}";
+                var logMessage = $"{DateTime.Now: dd-MM-yyyy} Login {result} - Email: {email}";
                 await WriteLog(logMessage);
             }
             catch (Exception ex)

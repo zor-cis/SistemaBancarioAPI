@@ -30,6 +30,18 @@ namespace Application.Services
         {
             try
             {
+                if (!isValidateEmail(dto.Email))
+                {
+                    await _log.LogLoginUser(dto.Email, false);
+                    throw new ArgumentException("El correo electrónico es invalido");
+                }
+
+                if (!isValidatePassword(dto.Password))
+                {
+                    await _log.LogLoginUser(dto.Email, false);
+                    throw new ArgumentException("La contraseña es invalida");
+                }
+
                 var client = await _repo.GetClientByEmail(dto.Email);
 
                 if (client == null)
@@ -42,24 +54,6 @@ namespace Application.Services
                 {
                     await _log.LogLoginUser(dto.Email, false);
                     throw new ArgumentException("La contraseña es incorrecta");
-                }
-
-                if (client.Email != dto.Email)
-                {
-                    await _log.LogLoginUser(dto.Email, false);
-                    throw new ArgumentException("El correo electrónico no coincide");
-                }
-
-                if(!isValidateEmail(dto.Email))
-                {
-                    await _log.LogLoginUser(dto.Email, false);
-                    throw new ArgumentException("El correo electrónico es invalido");
-                }
-
-                if(!isValidatePassword(dto.Password))
-                {
-                    await _log.LogLoginUser(dto.Email, false);
-                    throw new ArgumentException("La contraseña es invalida");
                 }
 
                 var token = _token.CreateToken(client);
@@ -83,8 +77,25 @@ namespace Application.Services
         public async Task<AuthClient> SignUp(SignUpClient dto)
         {
             try
-            { 
-                
+            {
+                if (!isValidateEmail(dto.Email))
+                {
+                    await _log.LogLoginUser(dto.Email, false);
+                    throw new ArgumentException("Correo invalido");
+                }
+
+                if (!isValidatePassword(dto.Password))
+                {
+                    await _log.LogLoginUser(dto.Email, false);
+                    throw new ArgumentException("La contraseña debe tener al menos 6 caracteres, un número y una letra mayúscula.");
+                }
+
+                if (dto.Age() < 18)
+                {
+                    await _log.LogLoginUser(dto.Email, false);
+                    throw new ArgumentException("Debe ser mayor de edad para registrarte");
+                }
+
                var exist_email = await _repo.GetClientByEmail(dto.Email);
                var exist_dti = await _repo.GetDocumentTypeId(dto.DocumentTypeId);
 
@@ -100,23 +111,7 @@ namespace Application.Services
                     throw new ArgumentException("Este nuemero de documento ya esta registrado en el sistema.");
                 }
 
-                if (dto.Age() < 18)
-                {
-                    await _log.LogLoginUser(dto.Email, false);
-                    throw new ArgumentException("Debe ser mayor de edad para registrarte");
-                }
-
-                if (isValidateEmail(dto.Email)) 
-                { 
-                    await _log.LogLoginUser(dto.Email, false);
-                    throw new ArgumentException("Correo invalido");
-                }
-
-                if(isValidatePassword(dto.Password))
-                {
-                    await _log.LogLoginUser(dto.Email, false);
-                    throw new ArgumentException("La contraseña debe tener al menos 6 caracteres, un número y una letra mayúscula.");
-                }
+                
 
                 var client = new Client(
                     id: 0,
