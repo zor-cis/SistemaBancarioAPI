@@ -12,15 +12,14 @@ namespace Application.DTOs
         public string Email { get; set; }
         public string Password { get; set; }
 
-        //Constructor que inicializa los atributos del cliente y valida que los datos sean correctos.
+        //Constructor que inicializa los atributos del cliente.
         public LoginClient(string email, string password) 
         { 
-            if(string.IsNullOrEmpty(email))
-                throw new ArgumentException("El correo electrónico no puede estar vacío");
-            if (string.IsNullOrEmpty(password))
-                throw new ArgumentException("La contraseña no puede estar vacía");
             Email = email;
             Password = password;
         }
+
+        //Constructor para la deserializacion.
+        public LoginClient() { }
     }
 }

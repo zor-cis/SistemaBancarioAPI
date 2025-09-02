@@ -23,7 +23,9 @@ namespace Application.Services
 
         }
 
-        //Este metodo maneja el inicion de sesion de un cliente, se valida si el cliente existe y si la contraseña y el email es correcto, se crea un token y si todo es correcto se da acceso. 
+        //Este metodo maneja el inicion de sesion de un cliente, se valida si el cliente existe
+        //y si la contraseña y el email es correcto y se esta ingresando de acuerdo al formato
+        //esperado, se crea un token y si todo es correcto se da acceso. 
         public async Task<AuthClient> Login(LoginClient dto)
         {
             try
@@ -48,6 +50,18 @@ namespace Application.Services
                     throw new ArgumentException("El correo electrónico no coincide");
                 }
 
+                if(!isValidateEmail(dto.Email))
+                {
+                    await _log.LogLoginUser(dto.Email, false);
+                    throw new ArgumentException("El correo electrónico es invalido");
+                }
+
+                if(!isValidatePassword(dto.Password))
+                {
+                    await _log.LogLoginUser(dto.Email, false);
+                    throw new ArgumentException("La contraseña es invalida");
+                }
+
                 var token = _token.CreateToken(client);
                 await _log.LogLoginUser(dto.Email, true);
 
@@ -66,10 +80,11 @@ namespace Application.Services
         }
 
         //Este metodo maneja el registro de un cliente, se valida que el correo y el numero de identidad no esten ya registrados, y se valida que el cliente sea mayor de edad, si todo es correcto se crea un nuevo cliente y se genera el token.
-        public async Task<AuthClient> SignUp(SingUpClient dto)
+        public async Task<AuthClient> SignUp(SignUpClient dto)
         {
             try
-            {
+            { 
+                
                var exist_email = await _repo.GetClientByEmail(dto.Email);
                var exist_dti = await _repo.GetDocumentTypeId(dto.DocumentTypeId);
 
@@ -91,13 +106,13 @@ namespace Application.Services
                     throw new ArgumentException("Debe ser mayor de edad para registrarte");
                 }
 
-                if (!dto.Email.Contains("@")) 
+                if (isValidateEmail(dto.Email)) 
                 { 
                     await _log.LogLoginUser(dto.Email, false);
                     throw new ArgumentException("Correo invalido");
                 }
 
-                if(!dto.Password.Any(char.IsDigit) || !dto.Password.Any(char.IsUpper) || dto.Password.Length < 6)
+                if(isValidatePassword(dto.Password))
                 {
                     await _log.LogLoginUser(dto.Email, false);
                     throw new ArgumentException("La contraseña debe tener al menos 6 caracteres, un número y una letra mayúscula.");
@@ -132,6 +147,30 @@ namespace Application.Services
                 await _log.LogLoginUser(dto.Email, false);
                 throw new InvalidOperationException("Error al registrarse", ex);
             }
+        }
+
+
+
+
+
+        //#METODOS AUXILIARES: Validacion de Email y Password
+
+        //Valida que el email tenga un formato correcto.
+        private bool isValidateEmail(string email) 
+        { 
+            return !string.IsNullOrWhiteSpace(email) &&  //verifica que no sea nulo o espacios en blanco
+                email.Contains("@") && //verifica que contenga el simbolo @
+                email.Contains(".") && //verifica que contenga un punto
+                email.IndexOf("@") < email.LastIndexOf("."); //verifica que el @ este antes del punto
+        }
+
+        //Valida que la contraseña tenga el formato correcto.
+        private bool isValidatePassword(string password) 
+        { 
+            return !string.IsNullOrWhiteSpace(password) && //verifica que no sea nulo o espacios en blanco
+                password.Length >= 6 && //verifica que tenga al menos 6 caracteres
+                password.Any(char.IsDigit) && //verifica que tenga al menos un numero
+                password.Any(char.IsUpper); //verifica que tenga al menos una letra mayuscula
         }
     }
 }

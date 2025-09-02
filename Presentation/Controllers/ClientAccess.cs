@@ -25,12 +25,12 @@ namespace Presentation.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message});
             }
         }
 
         [HttpPost("SignUp")]
-        public async Task<IActionResult> SignUp([FromBody] SingUpClient dto) 
+        public async Task<IActionResult> SignUp([FromBody] SignUpClient dto) 
         {
             try
             {
@@ -39,7 +39,7 @@ namespace Presentation.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new {message = ex.Message});
             }
         }
     }

@@ -10,6 +10,6 @@ namespace Application.Interfaces
     public interface IAuthClient
     {
         Task<AuthClient> Login(LoginClient dto);
-        Task<AuthClient> SignUp(SingUpClient dto);
+        Task<AuthClient> SignUp(SignUpClient dto);
     }
 }
